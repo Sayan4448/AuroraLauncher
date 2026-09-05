@@ -5,10 +5,11 @@ export default defineConfig({
   main: {},
   preload: {},
   renderer: {
+    root: 'src/renderer',
     plugins: [vue({})],
     build: {
       rollupOptions: {
-        input: 'index.html'
+        input: 'src/renderer/index.html'
       }
     }
   }
