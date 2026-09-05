@@ -32,6 +32,18 @@
     "files": [
       "dist/**",
       "dist-electron/**"
-    ]
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "msi"
+      ]
+    },
+    "msi": {
+      "oneClick": false,
+      "perMachine": false,
+      "runAfterFinish": true
+    }
   }
 }
