@@ -1,51 +1,61 @@
-# Aurora Launcher ✦
+# Aurora Launcher
 
-Un starter de launcher Minecraft moderne, pensé comme « Prism Launcher mais plus joli », avec une différence centrale : **les mods manquants sont réparés automatiquement** pendant l'installation.
+Aurora Launcher est un launcher Minecraft moderne en Electron + Vue 3. Il prépare un modpack et résout automatiquement les mods compatibles depuis Modrinth (et CurseForge si une clé API est disponible).
 
-## Différence avec Prism
+## Importer un modpack en masse
 
-Aurora met l'accent sur une installation sans impasse : le résolveur tente Modrinth par hash, puis par projet/nom + version Minecraft + loader. CurseForge est utilisé en repli uniquement si `CURSEFORGE_API_KEY` est configurée.
+L’importateur accepte plusieurs sources :
 
-## Résolution automatique
+- un fichier **`.mrpack`** (Modrinth) ;
+- une archive **ZIP CurseForge** ;
+- un **dossier de mods** local ;
+- une **URL** de modpack ;
+- une **liste d’URLs ou de slugs**, collée en masse (une entrée par ligne).
 
-1. File limitée à 3 téléchargements simultanés.
-2. Modrinth v2 : `/version/{hash}`, puis `/search` et `/project/{id}/version`.
-3. Sélection du fichier compatible, téléchargement et vérification SHA-1.
-4. Trois tentatives par téléchargement.
-5. Repli CurseForge si Modrinth échoue et qu'une clé est disponible.
-6. États `pending`, `resolving`, `downloading`, `ok`, `failed` envoyés à l'interface via IPC.
+Après l’import, Aurora extrait le manifeste, déduplique les entrées, puis résout les versions correspondant à la version Minecraft et au loader sélectionnés. Les téléchargements sont suivis dans l’interface et limités en concurrence pour rester fiables.
 
-## Lancer
+## Catégories
+
+Les mods peuvent être organisés avec un système de catégories :
+
+- créer une catégorie ;
+- la renommer ou la supprimer ;
+- choisir sa couleur ;
+- sélectionner plusieurs mods et leur affecter une catégorie ;
+- filtrer l’affichage par catégorie ;
+- bénéficier d’une **auto-catégorisation** initiale à partir des tags Modrinth (par exemple `technology`, `magic`, `optimization` ou `adventure`).
+
+La sélection multiple permet de gérer rapidement un grand modpack, tandis que les filtres facilitent la recherche d’un groupe précis.
+
+## Développement
 
 ```bash
 npm install
 npm run dev
+npm run typecheck
+npm run build
 ```
 
-Construire : `npm run build`. Packager : `npm run package`.
+Le fichier `electron.vite.config.ts` est volontairement nommé ainsi : c’est le nom reconnu par `electron-vite`. Il active `@vitejs/plugin-vue` pour compiler les fichiers `.vue`.
 
-## Manifeste
+## Construire sous Windows
 
-Le pipeline accepte `ModPackManifest` dans `src/shared/types.ts` :
+Pré-requis : Windows 10/11 64 bits, Node.js 20 ou 22 LTS et une connexion internet. Les commandes exactes sont détaillées dans [`BUILD-WINDOWS.md`](BUILD-WINDOWS.md).
 
-```ts
-{ name: 'Mon pack', minecraft: '1.21.1', loader: 'fabric', mods: [
-  { name: 'Sodium', projectId: 'AANobbMI', gameVersion: '1.21.1', loader: 'fabric', hash: '...' }
-] }
+```powershell
+git clone https://github.com/Sayan4448/AuroraLauncher.git
+cd AuroraLauncher
+npm install
+npm run build
+npm run package
 ```
 
-Le bouton de démonstration de `App.vue` montre le flux avec Sodium et Lithium. Remplacez `manifest` par le manifeste de votre import.
+Les exécutables sont écrits dans `release/` : un installateur NSIS et une version portable. Pour un test sans installateur :
 
-## CurseForge
+```powershell
+npx electron-builder --win --dir
+```
 
-Ne mettez jamais la clé dans le dépôt. Lancez Electron avec `CURSEFORGE_API_KEY` dans son environnement. Modrinth reste le fournisseur par défaut.
+## Licence
 
-## Roadmap
-
-- Import `.mrpack` et détection des loaders Java.
-- Instances, comptes Microsoft et profils Java.
-- Reprise persistante et cache des métadonnées.
-- Paramètres JVM, logs et diagnostics exportables.
-- Tests d'intégration et releases signées.
-
-MIT. Starter indépendant, pas un fork de Prism Launcher.
+Voir [LICENSE](LICENSE).
