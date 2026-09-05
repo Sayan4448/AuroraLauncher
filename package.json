@@ -45,5 +45,9 @@
       "perMachine": false,
       "runAfterFinish": true
     }
+  },
+  "allowScripts": {
+    "electron@34.5.8": true,
+    "esbuild@0.25.12": true
   }
 }
